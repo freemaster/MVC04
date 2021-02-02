@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ajax - 회원리스트 출력(  Model2 - front controller + POJO + HandlerMapping-HashMap ) </title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+$(document).ready( () => {
+    mList();
+    $("#btn").click( () => {
+        mList();
+    });
+    
+    //회원가입 버튼이 클릭되면 처리
+    $("#sendBtn").click( () => {
+        //console.log( $("#formData").serialize());
+        var formData = $("#formData").serialize();
+        $.ajax({
+           url : "ajaxinsert.do",
+           type : "post",
+           data : formData ,
+           success : mList,
+           error : () => {
+               alert("error");
+           }
+        });
+    });
+});
+
+var content = (num) => {
+    $.ajax({
+       url : "ajaxcontent.do", //AjaxContentController
+       type : "post",
+       dataType : "json",
+       data : { "num" : num },
+       success : contentHtml,
+       error : () => {
+           alert("error");
+       }
+    });
+}
+
+var updateBtn = (num) => {
+    //console.log($("#updateData").serialize());
+    var updateData = $("#updateData").serialize();
+    $.ajax({
+        url : "ajaxupdate.do",
+        type : "post",
+        data : updateData,
+        success : mList,
+        error : () => {
+            alert("error");
+        }
+    });
+};
+
+var deleteBtn = (num) => {
+    $.ajax({
+        url : "ajaxdelete.do",
+        type : "post",
+        data : { "num" : num },
+        success : mList,
+        error : () => {
+            alert("error");
+        }
+    });
+}
+
+var mList = () => {
+    $.ajax({
+        url : "ajaxlist.do", // <--- AjaxListController
+        type : "get",
+        dataType : "json", // <--- json
+        success : resultHtml,
+        error : () => {
+            alert("error");
+        }
+    });
+}
+
+var resultHtml = (data) => {
+    //console.log(data);
+    var view = "<table class='table table-hover'>";
+    view += "<thead class='thead-dark'>";
+    view += "<tr>";
+    view += "<td>번호</td>";
+    view += "<td>아이디</td>";
+    view += "<td>이름</td>";
+    view += "<td>나이</td>";
+    view += "<td>이메일</td>";
+    view += "<td>전화번호</td>";
+    view += "<td>관리</td>";
+    view += "</tr>";
+    view += "</thead>";
+    view += "<tbody>";
+    $.each(data, (index, vo) => {
+        view += "<tr>";
+        view += "<td>"+vo.num+"</td>";
+        //view += "<td><a href='javascript:content("+vo.num+");' >"+vo.id+"</a></td>";
+        view += "<td><a href='#' onclick='content("+vo.num+");' data-toggle='modal' data-target='.bd-example-modal-lg2'>"+vo.id+"</a></td>";
+        view += "<td>"+vo.mname+"</td>";
+        view += "<td>"+vo.mage+"</td>";
+        view += "<td>"+vo.memail+"</td>";
+        view += "<td>"+vo.mtel+"</td>";
+        view += "<td><input type='button' onclick='deleteBtn("+vo.num+")' value='삭제' class='btn btn-warning'></td>";
+        view += "</tr>";
+    });
+    view += "<tr>";
+    view += "<td colspan='7' align='right'><input type='button' value='회원가입' class='btn btn-primary' data-toggle='modal' data-target='.bd-example-modal-lg'></td>";
+    view += "</tr>";
+    view += "</tbody>";
+    view += "</table>";
+    
+    $("#list").html(view);
+    
+    //강제로 클릭 이벤트 발생해서 초기화
+    $(".resetBtn").trigger("click");
+    /* 폼을 초기화
+    $("form").each(function() {  
+        this.reset();  
+     });
+     */
+    //$("#regist").css("display","none");
+    
+}
+
+var contentHtml = (data) => { // data <--------- JSON
+    var view = ("<form method='post' id='updateData'>");
+    view += ("<table class='table table-hover'>");
+    view += ("<input type='hidden' name='num' value='"+data.num+"'>");
+    view += ("<tr>");
+    view += ("<td>번호</td>");
+    view += ("<td>"+data.num+"</td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>아이디</td>");
+    view += ("<td>"+data.id+"</td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>비밀번호</td>");
+    view += ("<td>"+data.pass+"</td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>이름</td>");
+    view += ("<td>"+data.mname+"</td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>나이</td>");
+    view += ("<td><input type='text' name='mage' value='"+data.mage+"'></td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>이메일</td>");
+    view += ("<td><input type='text' name='memail' value='"+data.memail+"'></td>");
+    view += ("</tr>");
+    view += ("<tr>");
+    view += ("<td>전화번호</td>");
+    view += ("<td><input type='text' name='mtel' value='"+data.mtel+"'></td>");
+    view += ("</tr>");
+    view += ("<td colspan='2' style='text-align:center;'>");
+    view += ("<input type='button' value='수정' class='updateBtn btn btn-primary' onclick='updateBtn("+data.num+")'>&nbsp;&nbsp;");
+    view += ("<input type='reset' class='resetBtn btn btn-primary' value='취소' data-dismiss='modal'>&nbsp;&nbsp;");
+    view += ("</td>");
+    view += ("</tr>");
+    view += ("</table>");
+    view += ("</form>");
+    
+    $("#modify").html(view);
+}
+
+</script>
+</head>
+<body>
+    <div>
+    <hr>
+    회원리스트 출력(  Model2 - front controller + POJO + HandlerMapping-HashMap )
+    </hr>
+        <hr>
+        <input type="button" value="회원리스트 보기" id="btn">
+        <hr>
+        <div id="list">회원정보가 없습니다.</div>
+    </div>
+    <hr>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- <div class="modal-content" id="regist">-->
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">회원가입</h4>
+                    <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" id="formData">
+                        <table class='table table-hover'>
+                            <tr>
+                                <th>아이디</th>
+                                <td><input type="text" name="id"></td>
+                            </tr>
+                            <tr>
+                                <th>비밀번호</th>
+                                <td><input type="password"
+                                    name="pass"></td>
+                            </tr>
+                            <tr>
+                                <th>이름</th>
+                                <td><input type="text" name="mname"></td>
+                            </tr>
+                            <tr>
+                                <th>나이</th>
+                                <td><input type="text" name="mage"></td>
+                            </tr>
+                            <tr>
+                                <th>이메일</th>
+                                <td><input type="text"
+                                    name="memail"></td>
+                            </tr>
+                            <tr>
+                                <th>전화번호</th>
+                                <td><input type="text" name="mtel"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="btns" align="center">
+                                    <input type="button" value="회원가입" id="sendBtn"  class='btn btn-primary'>
+                                    &nbsp;&nbsp; 
+                                    <input type="reset" class="resetBtn btn btn-primary"  value="취소" data-dismiss='modal'>
+                                    &nbsp;&nbsp;
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="modal fade bd-example-modal-lg2" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- <div class="modal-content" id="regist">-->
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">회원정보 수정</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modify"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

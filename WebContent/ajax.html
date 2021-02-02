@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+function go(msg) {
+    alert(msg+" javascript!!");
+    window.open("aaa.html", "", "width=200, height=200");
+    var v = document.getElementById("a");
+    v.innerHTML = msg+" javascript ~~ !!";
+    $("#b").text("동해물과 백두산이 마르고 닳도록 ");
+}
+</script>
+</head>
+<body>
+<input type="button" id="btnGo" value="회원리스트 보기" onclick="go('Hello');">
+<hr>
+<div id="a">여기에 리스르틀 출력</div>
+<hr>
+<div id="b">여기에 리스르틀 출력</div>
+<hr>
+<div id="c">여기에 리스르틀 출력</div>
+</body>
+</html>
